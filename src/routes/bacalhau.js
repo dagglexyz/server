@@ -1,4 +1,4 @@
-const { getJob, getJobStatus, submitJob } = require("../controllers/bacalhau");
+const { submitJob } = require("../controllers/bacalhau");
 const auth = require("../middlewares/auth");
 
 const router = require("express").Router();

@@ -24,4 +24,4 @@ async function submitJob(req, res) {
 }
 
 
-module.exports = { submitJob, getJob, getJobStatus }
+module.exports = { submitJob }

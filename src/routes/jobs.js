@@ -1,10 +1,10 @@
-const { getJobs } = require("../controllers/jobs");
+const { getJobs, getJobStatus } = require("../controllers/jobs");
 const auth = require("../middlewares/auth");
 
 const router = require("express").Router();
 
 router.get("/", auth, getJobs);
 
-// router.get("/:job_id", getJob);
+router.get("/state/:id", getJobStatus);
 
 module.exports = router;
