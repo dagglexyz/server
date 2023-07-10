@@ -24,7 +24,7 @@ const FileSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ['dataset', 'model', 'script', 'file']
+            enum: ['dataset', 'model', 'file']
         },
         job_id: {
             type: String,
