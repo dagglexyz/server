@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const { OtpNonce } = require("./otpnonce");
+const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -16,6 +17,11 @@ const UserSchema = new mongoose.Schema(
 				}
 			},
 		},
+		password: {
+			type: String,
+			trim: true,
+			minlength: 6,
+		},
 		displayName: {
 			type: String,
 			trim: true,
@@ -24,7 +30,6 @@ const UserSchema = new mongoose.Schema(
 		address: {
 			type: String,
 			trim: true,
-			required: true,
 			unique: true,
 			validate(value) {
 				if (!validator.isEthereumAddress(value.toString())) {
@@ -58,7 +63,7 @@ const UserSchema = new mongoose.Schema(
 			},
 		},
 		is_email_verified: {
-			type: Boolean
+			type: Boolean,
 		},
 		disabled: {
 			type: Boolean,
@@ -85,8 +90,8 @@ const UserSchema = new mongoose.Schema(
 		credits: {
 			type: Number,
 			default: 0,
-			required: true
-		}
+			required: true,
+		},
 	},
 	{
 		timestamps: true,
@@ -101,6 +106,27 @@ UserSchema.methods.toJSON = function () {
 
 	return userObject;
 };
+
+// Schema methods
+UserSchema.statics.findByCredentials = async function (username, password) {
+	const user = await User.findOne({ username });
+	if (!user) {
+		throw new Error("Unable to login");
+	}
+	const isMatch = await bcrypt.compare(password, user.password);
+	if (!isMatch) {
+		throw new Error("Unable to login");
+	}
+	return user;
+};
+
+UserSchema.pre("save", async function (next) {
+	const user = this;
+	if (user.isModified("password")) {
+		user.password = await bcrypt.hash(user.password, 8);
+	}
+	next();
+});
 
 // Instance methods
 UserSchema.methods.generateToken = async function (nonce) {
@@ -128,6 +154,26 @@ UserSchema.methods.generateToken = async function (nonce) {
 
 	// Delete OTPNonces if everyting passes
 	await OtpNonce.deleteMany({ address: user.address });
+	return token;
+};
+
+UserSchema.methods.generatePasswordToken = async function (nonce) {
+	const otpNonce = await OtpNonce.findOne({
+		nonce,
+		expireAt: { $gt: new Date() },
+	});
+	if (!otpNonce) throw new Error("Invalid or expired nonce.");
+
+	const user = this;
+	const token = jwt.sign({ _id: user._id, nonce }, process.env.JWT_SECRET, {
+		expiresIn: "1 days",
+	});
+	user.tokens = user.tokens.concat({ token, nonce });
+	await user.save();
+
+	// Delete OTPNonces if everyting passes
+	await OtpNonce.deleteMany({ nonce });
+
 	return token;
 };
 

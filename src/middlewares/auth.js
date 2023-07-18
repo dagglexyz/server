@@ -8,7 +8,6 @@ async function auth(req, res, next) {
 
 		const user = await User.findOne({
 			_id: decoded._id,
-			address: decoded.wallet_address,
 			"tokens.nonce": decoded.nonce,
 			"tokens.token": token,
 		});
