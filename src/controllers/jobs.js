@@ -1,6 +1,6 @@
 const { File } = require("../models/file")
 const { Job } = require("../models/job")
-const { default: axios } = require("axios")
+const { states } = require("@daggle/bacalhau-js")
 
 async function getJobs(req, res) {
     try {
@@ -18,14 +18,16 @@ async function getJobs(req, res) {
 async function getJobStatus(req, res) {
     try {
         const job = await Job.findById(req.params.id)
-        const response = await axios.get(`http://127.0.0.1:8000/bacalhau/state/${job.job_id}`)
-        const data = response.data._state
+        const response = await states(job.job_id);
+        const data = response.state
 
-        const state = data._state;
+        const state = data.State;
         job.status = state;
         if (state === "Completed") {
-            const cidObj = data._executions.filter(e => e._published_results._cid)[0]
-            const cid = cidObj._published_results._cid;
+            const cidObj = data.Executions.filter(
+							(e) => e.PublishedResults.CID
+						)[0];
+            const cid = cidObj.PublishedResults.CID;
             job.result = cid;
             if (job.type === "train-tensorflow") {
                 await new File({
