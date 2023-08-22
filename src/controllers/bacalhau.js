@@ -1,27 +1,58 @@
-const { default: axios } = require("axios");
 const { Job } = require("../models/job");
+const { submit, getClientId } = require("@daggle/bacalhau-js");
+const {
+	Payload,
+	Spec,
+	PublisherSpec,
+	StorageSpec,
+	JobSpecDocker,
+	Deal,
+} = require("@daggle/bacalhau-js/models");
 
 async function submitJob(req, res) {
-    try {
-        const response = await axios.post(`http://127.0.0.1:8000/bacalhau/submit`, req.body,
-            {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-        const data = response.data;
-        // Upload job id to polybase
-        const job = await Job({
-            job_id: data._job._metadata._id,
-            user: req.user._id,
-            type: req.body.type,
-        }).save();
+	try {
+		if (!req.body.jobspecdocker || !req.body.storagespec) {
+			return res.status(500).send({ message: "Please send valid body." });
+		}
 
-        res.send(job);
-    } catch (error) {
-        res.status(500).send({ message: error.message, error: error });
-    }
+		let inputs = [];
+		req.body.storagespec.forEach((s) => {
+			inputs.push(new StorageSpec(s));
+		});
+
+		const payload = new Payload({
+			ClientID: getClientId(),
+			spec: new Spec({
+				engine: "Docker",
+				verifier: "Noop",
+				publisher_spec: new PublisherSpec({ type: "Estuary" }),
+				inputs: inputs,
+				docker: new JobSpecDocker(req.body.jobspecdocker),
+				timeout: 1800,
+				outputs: [
+					new StorageSpec({
+						StorageSource: "IPFS",
+						name: "outputs",
+						path: "/outouts",
+					}),
+				],
+				deal: new Deal(),
+				do_not_track: false,
+			}),
+		});
+
+		const response = await submit(payload);
+		// Upload job id to polybase
+		const job = await Job({
+			job_id: response.job.Metadata.ID,
+			user: req.user._id,
+			type: req.body.type,
+		}).save();
+
+		res.send(job);
+	} catch (error) {
+		res.status(500).send({ message: error.message, error: error });
+	}
 }
 
-
-module.exports = { submitJob }
+module.exports = { submitJob };

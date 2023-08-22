@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@daggle/bacalhau-js": "^0.0.1",
+    "@daggle/bacalhau-js": "^0.0.11",
     "@metamask/eth-sig-util": "^6.0.0",
     "@spheron/storage": "^1.0.19",
     "axios": "^1.4.0",
