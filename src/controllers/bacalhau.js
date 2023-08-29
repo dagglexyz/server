@@ -33,7 +33,7 @@ async function submitJob(req, res) {
 					new StorageSpec({
 						StorageSource: "IPFS",
 						name: "outputs",
-						path: "/outouts",
+						path: "/outputs",
 					}),
 				],
 				deal: new Deal(),
@@ -79,14 +79,14 @@ async function createDockerJob(req, res) {
 					new StorageSpec({
 						StorageSource: "IPFS",
 						name: "outputs",
-						path: "/outouts",
+						path: "/outputs",
 					}),
 				],
 				deal: new Deal(),
 				do_not_track: false,
 			}),
 		});
-
+		
 		const response = await submit(payload);
 		// Upload job id to polybase
 		const job = await Job({
