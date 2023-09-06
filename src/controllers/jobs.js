@@ -5,14 +5,47 @@ const { states } = require("@daggle/bacalhau-js")
 async function getJobs(req, res) {
     try {
         let jobs = []
-        if (req.query.query !== "undefined" && req.query.query !== "") {
-            jobs = await Job.find({ user: req.user._id, job_id: req.query.query }).sort({ createdAt: "desc" })
-        } else
-            jobs = await Job.find({ user: req.user._id }).sort({ createdAt: "desc" })
+        if (req.user) {
+            if (req.query.query !== "undefined" && req.query.query !== "") {
+                jobs = await Job.find({
+                    user: req.user._id,
+                    job_id: req.query.query,
+                }).sort({ createdAt: "desc" });
+            } else
+                jobs = await Job.find({ user: req.user._id }).sort({
+                    createdAt: "desc",
+                });
+        } else {
+            jobs = await Job.aggregate([
+                {
+                    $group: {
+                        _id: "$job_id",
+                        job: { $first: "$$CURRENT" },
+                    },
+                },
+                { $sort: { "job.createdAt": -1 } },
+                {$limit:20}
+            ]);
+        }
         res.send(jobs);
     } catch (error) {
         res.status(500).send({ message: error.message })
     }
+}
+
+async function getJobEvents(req, res) {
+	try {
+        let jobs = await Job.aggregate([
+            {
+                $match: {
+                    job_id: req.params.id,
+                },
+            },
+        ]).sort({ createdAt: "desc" });
+		res.send(jobs);
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
 }
 
 async function getJobStatus(req, res) {
@@ -48,5 +81,6 @@ async function getJobStatus(req, res) {
 
 module.exports = {
     getJobs,
+    getJobEvents,
     getJobStatus
 }

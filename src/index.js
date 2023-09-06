@@ -43,6 +43,8 @@ app.use(express.json());
 const { routes } = require("./routes");
 // routes.websiteV1(app);
 app.use(routes)
+// Wwebsocket
+require("./indexer");
 
 app.get("/", (req, res) => {
     res.send({ message: "🍑🍆💦" });

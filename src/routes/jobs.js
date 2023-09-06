@@ -1,9 +1,11 @@
-const { getJobs, getJobStatus } = require("../controllers/jobs");
-const auth = require("../middlewares/auth");
+const { getJobs, getJobStatus, getJobEvents } = require("../controllers/jobs");
+const getUser = require("../middlewares/getUser");
 
 const router = require("express").Router();
 
-router.get("/", auth, getJobs);
+router.get("/", getUser, getJobs);
+
+router.get("/events/:id", getJobEvents);
 
 router.get("/state/:id", getJobStatus);
 

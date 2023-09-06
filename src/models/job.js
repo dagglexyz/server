@@ -8,7 +8,6 @@ const JobSchema = new mongoose.Schema(
 		},
 		user: {
 			type: mongoose.Types.ObjectId,
-			required: true,
 		},
 		type: {
 			type: String,
@@ -21,14 +20,42 @@ const JobSchema = new mongoose.Schema(
 				"removebg",
 				"docker",
 			],
+			default: " ",
 		},
 		status: {
 			type: String,
-			default: "Created",
+			default: " ",
 			required: true,
 		},
 		result: {
 			type: String,
+		},
+		// Indexer properties
+		event_name: {
+			type: String,
+			required: true,
+		},
+		client_id: {
+			type: String,
+			required: true,
+		},
+		execution_id: {
+			type: String,
+			required: true,
+		},
+		source_node_id: {
+			type: String,
+			required: true,
+		},
+		target_node_id: {
+			type: String,
+			required: true,
+		},
+		event_time: {
+			type: String,
+		},
+		published_result: {
+			type: Object,
 		},
 	},
 	{

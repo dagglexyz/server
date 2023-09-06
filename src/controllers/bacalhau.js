@@ -47,6 +47,7 @@ async function submitJob(req, res) {
 			job_id: response.job.Metadata.ID,
 			user: req.user._id,
 			type: req.body.type,
+			status: "Created",
 		}).save();
 
 		res.send(job);
@@ -86,13 +87,14 @@ async function createDockerJob(req, res) {
 				do_not_track: false,
 			}),
 		});
-		
+
 		const response = await submit(payload);
 		// Upload job id to polybase
 		const job = await Job({
 			job_id: response.job.Metadata.ID,
 			user: req.user._id,
 			type: "docker",
+			status: "Created",
 		}).save();
 
 		res.send(job);
