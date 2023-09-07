@@ -16,7 +16,18 @@ async function getJobs(req, res) {
                     createdAt: "desc",
                 });
         } else {
+            let queryOptions = []
+            if(req.query.query) {
+                queryOptions['$or'] = 
+									[
+										{ job_id: req.query.query },
+										{ client_id: req.query.query },
+									]
+            }
             jobs = await Job.aggregate([
+                {
+                    $match: { ...queryOptions },
+                },
                 {
                     $group: {
                         _id: "$job_id",
@@ -24,7 +35,7 @@ async function getJobs(req, res) {
                     },
                 },
                 { $sort: { "job.createdAt": -1 } },
-                {$limit:20}
+                { $limit: 20 },
             ]);
         }
         res.send(jobs);
