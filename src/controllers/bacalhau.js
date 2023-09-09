@@ -48,6 +48,11 @@ async function submitJob(req, res) {
 			user: req.user._id,
 			type: req.body.type,
 			status: "Created",
+			client_id: response.job.Metadata.ClientID,
+			source_node_id: response.job.Metadata.Requester.RequesterNodeID,
+			event_name: " ",
+			execution_id: " ",
+			target_node_id: " ",
 		}).save();
 
 		res.send(job);
@@ -95,6 +100,11 @@ async function createDockerJob(req, res) {
 			user: req.user._id,
 			type: "docker",
 			status: "Created",
+			client_id: response.job.Metadata.ClientID,
+			source_node_id: response.job.Metadata.Requester.RequesterNodeID,
+			event_name: " ",
+			execution_id: " ",
+			target_node_id: " ",
 		}).save();
 
 		res.send(job);
