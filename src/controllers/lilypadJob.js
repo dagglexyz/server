@@ -1,7 +1,4 @@
-const { File } = require("../models/file");
-const { Job } = require("../models/job");
 const { LilypadJob } = require("../models/lilypadJob");
-const { states } = require("@daggle/bacalhau-js");
 const { Web3 } = require("web3");
 const web3 = new Web3(
 	"wss://polygon-mumbai.g.alchemy.com/v2/vkwriS_TfYwbocQ4DEbA1zSyq80MN-kT"
