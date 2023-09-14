@@ -1,8 +1,6 @@
 const { LilypadJob } = require("../models/lilypadJob");
 const { Web3 } = require("web3");
-const web3 = new Web3(
-	"wss://polygon-mumbai.g.alchemy.com/v2/vkwriS_TfYwbocQ4DEbA1zSyq80MN-kT"
-);
+const web3 = new Web3("https://api.node.glif.io");
 const JOB_COMPLETE_TOPIC = web3.utils.keccak256(
 	"JobCompleted(uint256,address,uint8,string)"
 );
@@ -31,7 +29,6 @@ async function getJobs(req, res) {
 		});
 		res.send(jobs);
 	} catch (error) {
-		console.log(error);
 		res.status(500).send({ message: error.message, error: error });
 	}
 }
@@ -42,14 +39,13 @@ async function getJob(req, res) {
 		if (!job) return res.status(404).send({ message: "Invalid job id." });
 
 		const response = await web3.eth.getPastLogs({
-			address: "0xdD6a7F72d68fbe6F347ff4c20EC0fa7eC9abB40B",
-			fromBlock: 39996840,
+			address: "0x148F40E2462754CA7189c2eF33cFeD2916Ca1BC3",
+			fromBlock: 3212154,
 			topics: [
 				[JOB_COMPLETE_TOPIC, JOB_CANCELED_TOPIC],
 				web3.eth.abi.encodeParameter("uint256", job.job_id),
 			],
 		});
-		console.log(response[0].data);
 		if (response.length > 0) {
 			const data = response[0].data;
 			const decoded = web3.eth.abi.decodeLog(
@@ -80,7 +76,6 @@ async function getJob(req, res) {
 		}
 		res.send(job);
 	} catch (error) {
-		console.log(error);
 		res.status(500).send({ message: error.message, error: error });
 	}
 }
