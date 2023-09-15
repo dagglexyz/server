@@ -14,6 +14,7 @@ async function createJob(req, res) {
 			job_id: req.body.job_id,
 			user: req.user._id,
 			tx_hash: req.body.tx_hash,
+			block_number: req.body.block_number,
 		}).save();
 
 		res.send(job);
@@ -39,8 +40,8 @@ async function getJob(req, res) {
 		if (!job) return res.status(404).send({ message: "Invalid job id." });
 
 		const response = await web3.eth.getPastLogs({
-			address: "0x148F40E2462754CA7189c2eF33cFeD2916Ca1BC3",
-			fromBlock: 3212154,
+			address: "0xFC9206c15Be795cde60ae5E419b26ecad4EBaf5e",
+			fromBlock: job.block_number ? job.block_number : 40131352,
 			topics: [
 				[JOB_COMPLETE_TOPIC, JOB_CANCELED_TOPIC],
 				web3.eth.abi.encodeParameter("uint256", job.job_id),
@@ -48,29 +49,29 @@ async function getJob(req, res) {
 		});
 		if (response.length > 0) {
 			const data = response[0].data;
-			const decoded = web3.eth.abi.decodeLog(
-				[
-					{
-						type: "uint256",
-						name: "jobId",
-						indexed: true,
-					},
-					{
-						type: "address",
-						name: "from",
-					},
-					{
-						type: "uint8",
-						name: "LilypadResultType",
-					},
-					{
-						type: "string",
-						name: "data",
-					},
-				],
-				data,
-				[JOB_COMPLETE_TOPIC, JOB_CANCELED_TOPIC]
-			);
+			let inputs = [
+				{
+					type: "uint256",
+					name: "jobId",
+					indexed: true,
+				},
+				{
+					type: "address",
+					name: "from",
+				},
+				{
+					type: "uint8",
+					name: "LilypadResultType",
+				},
+				{
+					type: "string",
+					name: "data",
+				},
+			];
+			if (response[0].topics.includes(JOB_CANCELED_TOPIC)) {
+				inputs.splice(2, 1);
+			}
+			const decoded = web3.eth.abi.decodeLog(inputs, data, response[0].topics);
 			job.result = decoded.data;
 			await job.save();
 		}

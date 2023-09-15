@@ -16,6 +16,9 @@ const LilypadJobSchema = new mongoose.Schema(
 		result: {
 			type: String,
 		},
+		block_number: {
+			type: Number,
+		},
 	},
 	{
 		timestamps: true,
