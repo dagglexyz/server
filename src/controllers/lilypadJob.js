@@ -40,7 +40,7 @@ async function getJob(req, res) {
 		if (!job) return res.status(404).send({ message: "Invalid job id." });
 
 		const response = await web3.eth.getPastLogs({
-			address: "0xFC9206c15Be795cde60ae5E419b26ecad4EBaf5e",
+			address: "0x148F40E2462754CA7189c2eF33cFeD2916Ca1BC3",
 			fromBlock: job.block_number ? job.block_number : 40131352,
 			topics: [
 				[JOB_COMPLETE_TOPIC, JOB_CANCELED_TOPIC],
