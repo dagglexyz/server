@@ -6,6 +6,7 @@ const jobs = require("./jobs");
 const lilypadJobs = require("./lilypadJob");
 const files = require("./files");
 const template = require("./template");
+const saturn = require("./saturn");
 
 router.use("/upload", upload);
 router.use("/user", user);
@@ -14,5 +15,6 @@ router.use("/jobs", jobs);
 router.use("/lilypad", lilypadJobs);
 router.use("/files", files);
 router.use("/template", template);
+router.use("/saturn", saturn);
 
 module.exports = { routes: router };
