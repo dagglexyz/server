@@ -12,7 +12,7 @@ router.post("/", auth, createTemplate);
 
 router.get("/", auth, getTemplates);
 
-router.post("/clone/:id", auth, cloneTemplate);
+router.post("/clone", auth, cloneTemplate);
 
 router.delete("/:id", auth, deleteTemplate);
 

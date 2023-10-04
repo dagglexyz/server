@@ -16,7 +16,7 @@ async function createTemplate(req, res) {
 
 async function cloneTemplate(req, res) {
 	try {
-		const template = await Template.findById(req.params.id);
+		const template = await Template.findById(req.body.id);
 		if (!template)
 			return res
 				.status(404)
