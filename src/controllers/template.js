@@ -36,6 +36,20 @@ async function cloneTemplate(req, res) {
 
 async function getTemplates(req, res) {
 	try {
+		const query = req.query;
+		const templates = await Template.find({
+			name: { $regex: query?.name ? query.name : "", $options: "i" },
+		}).sort({
+			createdAt: -1,
+		});
+		res.send(templates);
+	} catch (error) {
+		res.status(500).send({ message: error.message, error: error });
+	}
+}
+
+async function getUserTemplates(req, res) {
+	try {
 		const templates = await Template.find({ user: req.user._id }).sort({
 			createdAt: -1,
 		});
@@ -59,6 +73,7 @@ async function deleteTemplate(req, res) {
 module.exports = {
 	createTemplate,
 	getTemplates,
+	getUserTemplates,
 	cloneTemplate,
 	deleteTemplate,
 };
