@@ -25,7 +25,7 @@ async function submitJob(req, res) {
 			spec: new Spec({
 				engine: "Docker",
 				verifier: "Noop",
-				publisher_spec: new PublisherSpec({ type: "Estuary" }),
+				publisher_spec: new PublisherSpec({ type: "IPFS" }),
 				inputs: inputs,
 				docker: new JobSpecDocker(req.body.jobspecdocker),
 				timeout: 1800,
@@ -77,7 +77,7 @@ async function createDockerJob(req, res) {
 			spec: new Spec({
 				engine: "Docker",
 				verifier: "Noop",
-				publisher_spec: new PublisherSpec({ type: "Estuary" }),
+				publisher_spec: new PublisherSpec({ type: "IPFS" }),
 				inputs: inputs,
 				docker: new JobSpecDocker(req.body.jobspecdocker),
 				timeout: 1800,
