@@ -4,6 +4,7 @@ const {
 	generateNonce,
 	signUp,
 	login,
+	magicLogin,
 } = require("../controllers/user");
 const auth = require("../middlewares/auth");
 
@@ -18,5 +19,7 @@ router.post("/generateNonce", generateNonce);
 router.post("/signup", signUp);
 
 router.post("/login", login);
+
+router.post("/magicLogin", magicLogin);
 
 module.exports = router;

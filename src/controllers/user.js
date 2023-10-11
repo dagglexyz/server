@@ -77,4 +77,23 @@ async function login(req, res) {
 	}
 }
 
-module.exports = { signin, getUser, generateNonce, signUp, login };
+async function magicLogin(req, res) {
+	try {
+		const { nonce, address } = req.body;
+		let user = await User.findOne({ address });
+		let token;
+		if (!user) {
+			user = new User(req.body);
+			if (!user.username) {
+				user.username = user.address;
+			}
+		}
+		token = await user.generateToken(nonce);
+
+		res.status(201).send({ user, token });
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
+}
+
+module.exports = { signin, getUser, generateNonce, signUp, login, magicLogin };
